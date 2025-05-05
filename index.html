@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BMI Calculator</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.6/lottie.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>BMI Calculator</h1>
+
+    <div class="form">
+      <input type="number" id="age" placeholder="Age" />
+      <select id="gender">
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+      <input type="number" id="height" placeholder="Height (cm)" />
+      <input type="number" id="weight" placeholder="Weight (kg)" />
+      <button onclick="calculateBMI()">Calculate</button>
+    </div>
+
+    <div id="bmiResult" class="result"></div>
+    <div id="bmiTrend"></div>
+    <div id="weightSuggestion" class="suggestion"></div>
+    <div id="bmiLottie" class="lottie-box"></div>
+
+    <h2>Recent History</h2>
+    <ul id="historyList" class="history-list"></ul>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
