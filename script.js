@@ -33,66 +33,87 @@ function calculateBMI() {
   const previousBMI =
     history.length > 0 ? parseFloat(history[history.length - 1].bmi) : null;
 
-  // Show trend
-  if (previousBMI !== null) {
-    if (bmiRounded < previousBMI) {
-      trendContainer.innerHTML = `<span style="color: green;">⬇️ BMI decreased since last check!</span>`;
-    } else if (bmiRounded > previousBMI) {
-      trendContainer.innerHTML = `<span style="color: red;">⬆️ BMI increased since last check.</span>`;
-    } else {
-      trendContainer.innerHTML = `<span style="color: gray;">➡️ BMI unchanged since last check.</span>`;
-    }
-  } else {
-    trendContainer.innerHTML = "";
-  }
+  let trendMessage = "";
+  let animationPath = "";
+  let feedbackMessage = "";
 
-  // Sound + Animation
-  let animationPath = "",
-    message = "";
+  const getBMICategory = (bmiValue) => {
+    if (bmiValue < 18.5) return "underweight";
+    if (bmiValue <= 24.9) return "healthy";
+    if (bmiValue <= 29.9) return "overweight";
+    return "obese";
+  };
+
+  const currentCategory = getBMICategory(bmiRounded);
+  const previousCategory = previousBMI ? getBMICategory(previousBMI) : null;
+
+  // BMI trend logic
   if (previousBMI !== null) {
-    if (bmiRounded < previousBMI) {
-      animationPath = "./Animations/happy.png";
-      message = "Good job! BMI decreased!";
-      playSound("happy");
-    } else if (bmiRounded > previousBMI) {
-      animationPath = "./Animations/sad.png";
-      message = "Oh no! BMI increased.";
-      playSound("error");
-    } else {
+    const delta = bmiRounded - previousBMI;
+    const isImprovement =
+      (previousCategory === "underweight" && bmiRounded > previousBMI) ||
+      (previousCategory === "overweight" && bmiRounded < previousBMI) ||
+      (previousCategory === "obese" && bmiRounded < previousBMI) ||
+      (previousCategory === "healthy" &&
+        currentCategory === "healthy" &&
+        Math.abs(delta) < 0.5);
+
+    if (delta === 0) {
+      trendMessage = `<span style="color: gray;">➡️ BMI unchanged since last check.</span>`;
       animationPath = "./Animations/neutral.png";
-      message = "BMI remains the same. Maintain your routine!";
       playSound("alert");
-    }
-  } else {
-    // First entry logic (based on standard ranges)
-    if (bmi < 18.5) {
-      animationPath = "./Animations/sad.png";
-      message = "Underweight. Eat more healthy food!";
-      playSound("alert");
-    } else if (bmi <= 24.9) {
+    } else if (isImprovement) {
+      trendMessage = `<span style="color: green;">${
+        delta > 0 ? "⬆️" : "⬇️"
+      } BMI improved since last check!</span>`;
       animationPath = "./Animations/happy.png";
-      message = "Great! You're healthy. 🎉";
       playSound("happy");
-    } else if (bmi <= 29.9) {
-      animationPath = "./Animations/neutral.png";
-      const diff = (weight - 24.9 * (heightM * heightM)).toFixed(1);
-      message = `Overweight. Try to lose ~${diff} kg.`;
-      playSound("alert");
     } else {
+      trendMessage = `<span style="color: red;">${
+        delta > 0 ? "⬆️" : "⬇️"
+      } BMI worsened since last check.</span>`;
       animationPath = "./Animations/sad.png";
-      const diff = (weight - 24.9 * (heightM * heightM)).toFixed(1);
-      message = `Obese. You need to lose ~${diff} kg.`;
       playSound("error");
     }
+
+    trendContainer.innerHTML = trendMessage;
+  } else {
+    trendContainer.innerHTML = ""; // First entry
   }
 
-  suggestion.innerText = message;
+  // Weight change suggestion logic
+  const healthyMinBMI = 18.5;
+  const healthyMaxBMI = 24.9;
 
-  // Show animation using <img>
-  lottieContainer.innerHTML = "";
+  if (bmiRounded < healthyMinBMI) {
+    const targetWeight = healthyMinBMI * heightM * heightM;
+    const gainNeeded = (targetWeight - weight).toFixed(1);
+    feedbackMessage = `Underweight. Eat nutritious food and aim to gain ~${gainNeeded} kg.`;
+    if (!animationPath) animationPath = "./Animations/sad.png";
+    playSound("alert");
+  } else if (bmiRounded <= healthyMaxBMI) {
+    feedbackMessage = "Great! You're healthy. 🎉";
+    if (!animationPath) animationPath = "./Animations/happy.png";
+    playSound("happy");
+  } else if (bmiRounded <= 29.9) {
+    const targetWeight = healthyMaxBMI * heightM * heightM;
+    const loseNeeded = (weight - targetWeight).toFixed(1);
+    feedbackMessage = `Overweight. Try to lose ~${loseNeeded} kg.`;
+    if (!animationPath) animationPath = "./Animations/neutral.png";
+    playSound("alert");
+  } else {
+    const targetWeight = healthyMaxBMI * heightM * heightM;
+    const loseNeeded = (weight - targetWeight).toFixed(1);
+    feedbackMessage = `Obese. You need to lose ~${loseNeeded} kg.`;
+    if (!animationPath) animationPath = "./Animations/sad.png";
+    playSound("error");
+  }
+
+  // Display final output
+  suggestion.innerText = feedbackMessage;
   lottieContainer.innerHTML = `<img src="${animationPath}" alt="BMI Feedback" style="max-width:100%; height:auto;" />`;
 
-  // Save in localStorage
+  // Save entry
   const date = new Date().toLocaleDateString();
   const entry = { date, age, gender, height, weight, bmi: bmiRounded };
   history.push(entry);
