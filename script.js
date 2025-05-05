@@ -51,38 +51,35 @@ function calculateBMI() {
     message = "";
   if (previousBMI !== null) {
     if (bmiRounded < previousBMI) {
-      animationPath = "animations/happy.json";
+      animationPath = "./Animations/happy.png";
       message = "Good job! BMI decreased!";
       playSound("happy");
     } else if (bmiRounded > previousBMI) {
-      animationPath = "animations/sad.json";
+      animationPath = "./Animations/sad.png";
       message = "Oh no! BMI increased.";
       playSound("error");
     } else {
-      animationPath = "animations/neutral.json";
+      animationPath = "./Animations/neutral.png";
       message = "BMI remains the same. Maintain your routine!";
       playSound("alert");
     }
   } else {
     // First entry logic (based on standard ranges)
     if (bmi < 18.5) {
-      animationPath = "animations/sad.json";
+      animationPath = "./Animations/sad.png";
       message = "Underweight. Eat more healthy food!";
       playSound("alert");
     } else if (bmi <= 24.9) {
-      animationPath =
-        "https://raw.githubusercontent.com/tarun261003/BMI/refs/heads/main/Animations/happy.json";
+      animationPath = "./Animations/happy.png";
       message = "Great! You're healthy. 🎉";
       playSound("happy");
     } else if (bmi <= 29.9) {
-      animationPath =
-        "https://raw.githubusercontent.com/tarun261003/BMI/refs/heads/main/Animations/neutral.json";
+      animationPath = "./Animations/neutral.png";
       const diff = (weight - 24.9 * (heightM * heightM)).toFixed(1);
       message = `Overweight. Try to lose ~${diff} kg.`;
       playSound("alert");
     } else {
-      animationPath =
-        "https://raw.githubusercontent.com/tarun261003/BMI/refs/heads/main/Animations/sad.json";
+      animationPath = "./Animations/sad.png";
       const diff = (weight - 24.9 * (heightM * heightM)).toFixed(1);
       message = `Obese. You need to lose ~${diff} kg.`;
       playSound("error");
@@ -91,21 +88,16 @@ function calculateBMI() {
 
   suggestion.innerText = message;
 
-  // Lottie
+  // Show animation using <img>
   lottieContainer.innerHTML = "";
-  lottie.loadAnimation({
-    container: lottieContainer,
-    renderer: "svg",
-    loop: true,
-    autoplay: true,
-    path: animationPath,
-  });
+  lottieContainer.innerHTML = `<img src="${animationPath}" alt="BMI Feedback" style="max-width:100%; height:auto;" />`;
 
   // Save in localStorage
   const date = new Date().toLocaleDateString();
   const entry = { date, age, gender, height, weight, bmi: bmiRounded };
   history.push(entry);
   localStorage.setItem("bmiHistory", JSON.stringify(history));
+
   renderHistory();
 }
 
