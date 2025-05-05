@@ -70,16 +70,16 @@ function calculateBMI() {
       message = "Underweight. Eat more healthy food!";
       playSound("alert");
     } else if (bmi <= 24.9) {
-      animationPath = "animations/happy.json";
+      animationPath = "https://raw.githubusercontent.com/tarun261003/BMI/refs/heads/main/Animations/happy.json";
       message = "Great! You're healthy. 🎉";
       playSound("happy");
     } else if (bmi <= 29.9) {
-      animationPath = "animations/neutral.json";
+      animationPath = "https://raw.githubusercontent.com/tarun261003/BMI/refs/heads/main/Animations/neutral.json";
       const diff = (weight - 24.9 * (heightM * heightM)).toFixed(1);
       message = `Overweight. Try to lose ~${diff} kg.`;
       playSound("alert");
     } else {
-      animationPath = "animations/sad.json";
+      animationPath = "https://raw.githubusercontent.com/tarun261003/BMI/refs/heads/main/Animations/sad.json";
       const diff = (weight - 24.9 * (heightM * heightM)).toFixed(1);
       message = `Obese. You need to lose ~${diff} kg.`;
       playSound("error");
